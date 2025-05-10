@@ -2,13 +2,11 @@ import java.time.LocalDate;
 class GoalWorkoutEntry extends WorkoutEntry {
     private int goalWeight;
     private int goalReps;
-    private LocalDate date;
 
-    public GoalWorkoutEntry(Exercise exercise, int weight, int reps, int sets, int goalWeight, int goalReps) {
-        super(exercise, weight, reps, sets);
+    public GoalWorkoutEntry(Exercise exercise, int weight, int reps, int sets, int goalWeight, int goalReps, LocalDate date) {
+        super(exercise, weight, reps, sets, date);
         this.goalWeight = goalWeight;
         this.goalReps = goalReps;
-        this.date = LocalDate.now();
     }
 
     public boolean isGoalAchieved() {
@@ -17,7 +15,7 @@ class GoalWorkoutEntry extends WorkoutEntry {
 
     @Override
     public String toCSV() {
-        return date + "," + super.toCSV() + "," + goalWeight + "," + goalReps;
+        return super.getDate() + "," + super.toCSV() + "," + goalWeight + "," + goalReps;
     }
 
     public static GoalWorkoutEntry fromCSV(String[] data, String[] target) {
@@ -28,7 +26,8 @@ class GoalWorkoutEntry extends WorkoutEntry {
                 base.getReps(),
                 base.getSets(),
                 Integer.parseInt(data[5]),
-                Integer.parseInt(data[6])
+                Integer.parseInt(data[6]),
+                base.getDate()
         );
     }
 }
