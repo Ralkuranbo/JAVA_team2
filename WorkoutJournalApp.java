@@ -264,14 +264,38 @@ public class WorkoutJournalApp {
     }
 
     private static void showStatistics() {
-        Map<String, Integer> partWeightSum = new HashMap<>();
-        for (WorkoutEntry entry : entries) {
-            String part = entry.getExercise().getClass().getSimpleName();
-            partWeightSum.put(part, partWeightSum.getOrDefault(part, 0) + entry.getTotalWeight());
+        if (user == null) {
+            System.out.println("사용자 정보가 설정되지 않았습니다. 먼저 사용자 정보를 입력해주세요.");
+            return;
         }
-        System.out.println("\n[운동 통계: 부위별 총 중량]");
-        for (Map.Entry<String, Integer> entry : partWeightSum.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue() + "kg");
+
+        // 사용자 기본 정보 출력
+        System.out.println("\n[사용자 정보]");
+        System.out.println("성별: " + (user.getGen()?"남자":"여자"));
+        System.out.println("나이: " + user.getAge());
+        System.out.println("키: " + user.getHeight() + "cm");
+        System.out.println("몸무게: " + user.getWeight() + "kg");
+
+        // 날짜별 운동 기록 정리
+        Map<LocalDate, List<WorkoutEntry>> entriesByDate = new TreeMap<>(); // 날짜 순 정렬을 위해 TreeMap 사용
+        for (WorkoutEntry entry : entries) {
+            LocalDate date = entry.getDate();
+            entriesByDate.putIfAbsent(date, new ArrayList<>());
+            entriesByDate.get(date).add(entry);
+        }
+
+        System.out.println("\n[날짜별 운동 기록]");
+        for (Map.Entry<LocalDate, List<WorkoutEntry>> dateEntry : entriesByDate.entrySet()) {
+            System.out.println(dateEntry.getKey());
+            for (WorkoutEntry entry : dateEntry.getValue()) {
+                System.out.printf("- [%s] %dkg x %d회 x %d세트 (총 중량: %dkg)\n",
+                    entry.getExercise().getName(),
+                    entry.getWeight(),
+                    entry.getReps(),
+                    entry.getSets(),
+                    entry.getTotalWeight()
+                );
+            }
         }
     }
 
