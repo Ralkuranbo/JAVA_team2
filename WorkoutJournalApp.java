@@ -4,56 +4,111 @@ import java.io.*;
 public class WorkoutJournalApp {
     private static List<WorkoutEntry> entries = new ArrayList<>();
     private static final Map<String, List<Exercise>> exercisesByPart = new LinkedHashMap<>();
+    private static User user;
 
     static {
-    	// 가슴 운동들
-        ChestExercise benchpress = new ChestExercise("벤치 프레스", new String[]{"대흉근", "삼두근"});
-        ChestExercise inclineBenchpress = new ChestExercise("인클라인 벤치프레스", new String[]{"대흉근 상부", "삼두근", "어깨 전면"});
-        ChestExercise pushup = new ChestExercise("푸시업", new String[]{"대흉근", "삼두근", "어깨 전면"});
-        ChestExercise dumbbellFly = new ChestExercise("덤벨 플라이", new String[]{"대흉근", "어깨 전면", "삼두근"});
-        ChestExercise cableCrossover = new ChestExercise("케이블 크로스오버", new String[]{"대흉근 내측", "대흉근 외측"});
+    	// 가슴
+        ChestExercise benchpress = new ChestExercise("벤치 프레스");
+        benchpress.target = new String[]{"대흉근", "삼두근"};
 
-        // 어깨 운동들
-        ShoulderExercise militaryPress = new ShoulderExercise("밀리터리 프레스", new String[]{"어깨 전체", "어깨 전면", "어깨 측면"});
-        ShoulderExercise dumbbellShoulderPress = new ShoulderExercise("덤벨 숄더 프레스", new String[]{"어깨 전체", "어깨 전면", "어깨 측면"});
-        ShoulderExercise sideLateralRaise = new ShoulderExercise("사이드 레터럴 레이즈", new String[]{"어깨 측면"});
-        ShoulderExercise frontRaise = new ShoulderExercise("프론트 레이즈", new String[]{"어깨 전면"});
-        ShoulderExercise reverseFly = new ShoulderExercise("리버스 플라이", new String[]{"어깨 후면", "상부 등"});
+        ChestExercise inclineBench = new ChestExercise("인클라인 벤치프레스");
+        inclineBench.target = new String[]{"대흉근 상부", "삼두근", "어깨 전면"};
 
-        // 등 운동들
-        BackExercise pullup = new BackExercise("풀업", new String[]{"광배근", "상부 등", "중부 등"});
-        BackExercise latPulldown = new BackExercise("랫 풀다운", new String[]{"광배근", "상부 등"});
-        BackExercise barbellRow = new BackExercise("바벨 로우", new String[]{"중부 등", "상부 등", "하부 등"});
-        BackExercise deadlift = new BackExercise("데드리프트", new String[]{"하체", "하부 등", "허리", "엉덩이"});
-        BackExercise tBarRow = new BackExercise("티바로우", new String[]{"상부 등", "중부 등"});
+        ChestExercise pushup = new ChestExercise("푸시업");
+        pushup.target = new String[]{"대흉근", "삼두근", "어깨 전면"};
 
-        // 하체 운동들
-        LegExercise squat = new LegExercise("스쿼트", new String[]{"대퇴사두근", "햄스트링", "엉덩이", "허리"});
-        LegExercise lunge = new LegExercise("런지", new String[]{"대퇴사두근", "햄스트링", "엉덩이"});
-        LegExercise legPress = new LegExercise("레그 프레스", new String[]{"대퇴사두근", "햄스트링", "엉덩이"});
-        LegExercise hipThrust = new LegExercise("힙 쓰러스트", new String[]{"엉덩이", "대퇴사두근", "햄스트링"});
-        LegExercise legCurl = new LegExercise("레그 컬", new String[]{"햄스트링"});
+        ChestExercise dumbbellFly = new ChestExercise("덤벨 플라이");
+        dumbbellFly.target = new String[]{"대흉근", "삼두근"};
 
-        // 팔 운동들
-        ArmExercise barbellCurl = new ArmExercise("바벨 컬", new String[]{"이두근"});
-        ArmExercise dumbbellCurl = new ArmExercise("덤벨 컬", new String[]{"이두근"});
-        ArmExercise tricepsPushdown = new ArmExercise("트라이셉스 푸시다운", new String[]{"삼두근"});
-        ArmExercise dips = new ArmExercise("딥스", new String[]{"삼두근", "가슴", "어깨"});
-        ArmExercise hammerCurl = new ArmExercise("해머 컬", new String[]{"이두근", "팔꿈치", "전완근"});
+        ChestExercise cableCrossover = new ChestExercise("케이블 크로스오버");
+        cableCrossover.target = new String[]{"대흉근 내측", "대흉근 외측"};
 
-        // 복근 운동들
-        AbsExercise crunch = new AbsExercise("크런치", new String[]{"복직근"});
-        AbsExercise legRaise = new AbsExercise("레그 레이즈", new String[]{"하복부", "엉덩이"});
-        AbsExercise plank = new AbsExercise("플랭크", new String[]{"코어", "복근", "허리"});
-        AbsExercise bicycleCrunch = new AbsExercise("바이시클 크런치", new String[]{"복직근", "복사근"});
-        AbsExercise hipDips = new AbsExercise("힙 딥스", new String[]{"하복부", "엉덩이", "허리"});
+        // 어깨
+        ShoulderExercise militaryPress = new ShoulderExercise("밀리터리 프레스");
+        militaryPress.target = new String[]{"어깨 전체", "어깨 전면", "어깨 측면"};
+
+        ShoulderExercise dumbbellShoulderPress = new ShoulderExercise("덤벨 숄더 프레스");
+        dumbbellShoulderPress.target = new String[]{"어깨 전체", "어깨 전면"};
+
+        ShoulderExercise sideLateralRaise = new ShoulderExercise("사이드 레터럴 레이즈");
+        sideLateralRaise.target = new String[]{"어깨 측면"};
+
+        ShoulderExercise frontRaise = new ShoulderExercise("프론트 레이즈");
+        frontRaise.target = new String[]{"어깨 전면"};
+
+        ShoulderExercise reverseFly = new ShoulderExercise("리버스 플라이");
+        reverseFly.target = new String[]{"어깨 후면"};
+
+        // 등
+        BackExercise pullup = new BackExercise("풀업");
+        pullup.target = new String[]{"광배근", "상부 등"};
+
+        BackExercise latPulldown = new BackExercise("랫 풀다운");
+        latPulldown.target = new String[]{"광배근", "상부 등"};
+
+        BackExercise barbellRow = new BackExercise("바벨 로우");
+        barbellRow.target = new String[]{"중부 등", "하부 등"};
+
+        BackExercise deadlift = new BackExercise("데드리프트");
+        deadlift.target = new String[]{"하체", "하부 등", "엉덩이"};
+
+        BackExercise tBarRow = new BackExercise("티바로우");
+        tBarRow.target = new String[]{"중부 등", "상부 등"};
+
+        // 하체
+        LegExercise squat = new LegExercise("스쿼트");
+        squat.target = new String[]{"대퇴사두근", "햄스트링", "엉덩이"};
+
+        LegExercise lunge = new LegExercise("런지");
+        lunge.target = new String[]{"대퇴사두근", "햄스트링", "엉덩이"};
+
+        LegExercise legPress = new LegExercise("레그 프레스");
+        legPress.target = new String[]{"대퇴사두근", "햄스트링"};
+
+        LegExercise hipThrust = new LegExercise("힙 쓰러스트");
+        hipThrust.target = new String[]{"엉덩이", "햄스트링"};
+
+        LegExercise legCurl = new LegExercise("레그 컬");
+        legCurl.target = new String[]{"햄스트링"};
+
+        // 팔
+        ArmExercise barbellCurl = new ArmExercise("바벨 컬");
+        barbellCurl.target = new String[]{"이두근"};
+
+        ArmExercise dumbbellCurl = new ArmExercise("덤벨 컬");
+        dumbbellCurl.target = new String[]{"이두근"};
+
+        ArmExercise pushdown = new ArmExercise("푸시다운");
+        pushdown.target = new String[]{"삼두근"};
+
+        ArmExercise dips = new ArmExercise("딥스");
+        dips.target = new String[]{"삼두근", "가슴"};
+
+        ArmExercise hammerCurl = new ArmExercise("해머 컬");
+        hammerCurl.target = new String[]{"이두근", "전완근"};
+
+        // 복근
+        AbsExercise crunch = new AbsExercise("크런치");
+        crunch.target = new String[]{"복직근"};
+
+        AbsExercise legRaise = new AbsExercise("레그 레이즈");
+        legRaise.target = new String[]{"하복부"};
+
+        AbsExercise plank = new AbsExercise("플랭크");
+        plank.target = new String[]{"코어", "복근"};
+
+        AbsExercise bicycle = new AbsExercise("바이시클 크런치");
+        bicycle.target = new String[]{"복직근", "복사근"};
+
+        AbsExercise hipDips = new AbsExercise("힙 딥스");
+        hipDips.target = new String[]{"복근", "옆구리"};
         
-        exercisesByPart.put("가슴", List.of(benchpress, inclineBenchpress, pushup, dumbbellFly, cableCrossover));
+        exercisesByPart.put("가슴", List.of(benchpress, inclineBench, pushup, dumbbellFly, cableCrossover));
         exercisesByPart.put("어깨", List.of(militaryPress, dumbbellShoulderPress, sideLateralRaise, frontRaise, reverseFly));
         exercisesByPart.put("등", List.of(pullup, latPulldown, barbellRow, deadlift, tBarRow));
         exercisesByPart.put("하체", List.of(squat, lunge, legPress, hipThrust, legCurl));
-        exercisesByPart.put("팔", List.of(barbellCurl, dumbbellCurl, tricepsPushdown, dips, hammerCurl));
-        exercisesByPart.put("복근", List.of(crunch, legRaise, plank, bicycleCrunch, hipDips));
+        exercisesByPart.put("팔", List.of(barbellCurl, dumbbellCurl, pushdown, dips, hammerCurl));
+        exercisesByPart.put("복근", List.of(crunch, legRaise, plank, bicycle, hipDips));
     }
 
     public static void main(String[] args) throws IOException {
@@ -126,6 +181,42 @@ public class WorkoutJournalApp {
     
     private static void userInfo(Scanner scanner) {
     	// 키, 성별, 나이 등 사용자 정보 입력받기 
+    	// 몸무게, 키를 숫자가 아닌 다른 형태로 입력했을시 예외처리
+    	int age;
+    	float weight, height;
+    	String gender;
+    	boolean gend;
+    	System.out.println("[사용자 정보 입력]");
+    	System.out.println(" 사용자의 성별을 입력해주세요(M/F): ");
+    	gender = scanner.next();
+    	gender = gender.toUpperCase();
+    	if(gender.equals("M") || gender.equals("MALE"))
+    		gend=true;
+    	else if(gender.equals("F") || gender.equals("FEMALE"))
+    		gend=false;
+    	else {
+    		System.out.println("오류 : 잘못된 성별입니다.");
+    		return;
+    	}
+    	System.out.println(" 사용자의 나이를 입력해주세요: ");
+    	age=scanner.nextInt();
+    	if(age <= 0) {
+    		System.out.println("오류 : 잘못된 나이입니다.");
+    		return;
+    	}
+    	System.out.println(" 사용자의 몸무게(kg)를 입력해주세요: ");
+    	weight=scanner.nextFloat();
+    	if(weight <= 0) {
+    		System.out.println("오류 : 잘못된 몸무게입니다.");
+    		return;
+    	}
+    	System.out.println(" 사용자의 키(cm)를 입력해주세요: ");
+    	height=scanner.nextFloat();
+    	if(height<= 0) {
+    		System.out.println("오류 : 잘못된 키입니다.");
+    		return;
+    	}
+    	user = new User(age, weight, gend, height);
     }
 
     private static void saveToFile(Scanner scanner) throws IOException {
