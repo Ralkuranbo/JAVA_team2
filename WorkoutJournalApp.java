@@ -1,34 +1,42 @@
 import java.util.*;
 import java.io.*;
+import java.time.LocalDate;
 
 public class WorkoutJournalApp {
     private static List<WorkoutEntry> entries = new ArrayList<>();
     private static final Map<String, List<Exercise>> exercisesByPart = new LinkedHashMap<>();
     private static User user;
+    private static LocalDate date;
+    private static Map<String, Integer> targetFrequency = new HashMap<>();
+    static final Set<String> ALLTARGETS = new HashSet<>(Arrays.asList(
+    	    "대흉근 중부", "삼두근", "대흉근 상부", "어깨 전면", "대흉근 내측", "대흉근 외측", "대흉근 하부",
+    	    "어깨 측면", "어깨 후면", "광배근", "상부 등", "중부 등", "하부 등", "둔근",
+    	    "대퇴사두근", "햄스트링", "이두근", "전완근", "복직근", "하복부", "코어", "복사근", "복횡근"
+    	));
 
     static {
     	// 가슴
         ChestExercise benchpress = new ChestExercise("벤치 프레스");
-        benchpress.target = new String[]{"대흉근", "삼두근"};
+        benchpress.target = new String[]{"대흉근 중부", "대흉근 하부", "삼두근"};
 
         ChestExercise inclineBench = new ChestExercise("인클라인 벤치프레스");
         inclineBench.target = new String[]{"대흉근 상부", "삼두근", "어깨 전면"};
 
         ChestExercise pushup = new ChestExercise("푸시업");
-        pushup.target = new String[]{"대흉근", "삼두근", "어깨 전면"};
+        pushup.target = new String[]{"대흉근 중부", "대흉근 하부", "삼두근", "어깨 전면"};
 
         ChestExercise dumbbellFly = new ChestExercise("덤벨 플라이");
-        dumbbellFly.target = new String[]{"대흉근", "삼두근"};
+        dumbbellFly.target = new String[]{"대흉근 중부", "삼두근"};
 
         ChestExercise cableCrossover = new ChestExercise("케이블 크로스오버");
         cableCrossover.target = new String[]{"대흉근 내측", "대흉근 외측"};
 
         // 어깨
         ShoulderExercise militaryPress = new ShoulderExercise("밀리터리 프레스");
-        militaryPress.target = new String[]{"어깨 전체", "어깨 전면", "어깨 측면"};
+        militaryPress.target = new String[]{"어깨 전면", "어깨 측면", "어깨 후면"};
 
         ShoulderExercise dumbbellShoulderPress = new ShoulderExercise("덤벨 숄더 프레스");
-        dumbbellShoulderPress.target = new String[]{"어깨 전체", "어깨 전면"};
+        dumbbellShoulderPress.target = new String[]{"어깨 전면", "어깨 측면", "어깨 후면"};
 
         ShoulderExercise sideLateralRaise = new ShoulderExercise("사이드 레터럴 레이즈");
         sideLateralRaise.target = new String[]{"어깨 측면"};
@@ -50,23 +58,23 @@ public class WorkoutJournalApp {
         barbellRow.target = new String[]{"중부 등", "하부 등"};
 
         BackExercise deadlift = new BackExercise("데드리프트");
-        deadlift.target = new String[]{"하체", "하부 등", "엉덩이"};
+        deadlift.target = new String[]{"하체", "하부 등", "둔근", "코어"};
 
         BackExercise tBarRow = new BackExercise("티바로우");
         tBarRow.target = new String[]{"중부 등", "상부 등"};
 
         // 하체
         LegExercise squat = new LegExercise("스쿼트");
-        squat.target = new String[]{"대퇴사두근", "햄스트링", "엉덩이"};
+        squat.target = new String[]{"대퇴사두근", "햄스트링", "둔근"};
 
         LegExercise lunge = new LegExercise("런지");
-        lunge.target = new String[]{"대퇴사두근", "햄스트링", "엉덩이"};
+        lunge.target = new String[]{"대퇴사두근", "햄스트링", "둔근"};
 
         LegExercise legPress = new LegExercise("레그 프레스");
         legPress.target = new String[]{"대퇴사두근", "햄스트링"};
 
         LegExercise hipThrust = new LegExercise("힙 쓰러스트");
-        hipThrust.target = new String[]{"엉덩이", "햄스트링"};
+        hipThrust.target = new String[]{"둔근", "햄스트링"};
 
         LegExercise legCurl = new LegExercise("레그 컬");
         legCurl.target = new String[]{"햄스트링"};
@@ -82,7 +90,7 @@ public class WorkoutJournalApp {
         pushdown.target = new String[]{"삼두근"};
 
         ArmExercise dips = new ArmExercise("딥스");
-        dips.target = new String[]{"삼두근", "가슴"};
+        dips.target = new String[]{"삼두근", "대흉근 하부", "대흉근 중부"};
 
         ArmExercise hammerCurl = new ArmExercise("해머 컬");
         hammerCurl.target = new String[]{"이두근", "전완근"};
@@ -95,13 +103,13 @@ public class WorkoutJournalApp {
         legRaise.target = new String[]{"하복부"};
 
         AbsExercise plank = new AbsExercise("플랭크");
-        plank.target = new String[]{"코어", "복근"};
+        plank.target = new String[]{"코어", "복직근", "복사근"};
 
         AbsExercise bicycle = new AbsExercise("바이시클 크런치");
         bicycle.target = new String[]{"복직근", "복사근"};
 
         AbsExercise hipDips = new AbsExercise("힙 딥스");
-        hipDips.target = new String[]{"복근", "옆구리"};
+        hipDips.target = new String[]{"복직근", "복사근", "복횡근"};
         
         exercisesByPart.put("가슴", List.of(benchpress, inclineBench, pushup, dumbbellFly, cableCrossover));
         exercisesByPart.put("어깨", List.of(militaryPress, dumbbellShoulderPress, sideLateralRaise, frontRaise, reverseFly));
@@ -172,9 +180,17 @@ public class WorkoutJournalApp {
         int goalWeight = scanner.nextInt();
         System.out.print("목표 횟수: ");
         int goalReps = scanner.nextInt();
-
-        GoalWorkoutEntry entry = new GoalWorkoutEntry(exercise, weight, reps, sets, goalWeight, goalReps);
+        
+        date=LocalDate.now();
+        GoalWorkoutEntry entry = new GoalWorkoutEntry(exercise, weight, reps, sets, goalWeight, goalReps, date);
         entries.add(entry);
+        
+        String[] targets = exercise.target;
+        if (targets != null) {
+            for (String t : targets) {
+                targetFrequency.put(t, targetFrequency.getOrDefault(t, 0) + 1);
+            }
+        }
 
         System.out.println("운동이 추가되었습니다. 목표 달성 여부: " + (entry.isGoalAchieved() ? "성공" : "실패"));
     }
@@ -220,8 +236,7 @@ public class WorkoutJournalApp {
     }
 
     private static void saveToFile(Scanner scanner) throws IOException {
-        System.out.print("저장할 파일 이름을 입력하세요: ");
-        String fileName = scanner.next();
+        String fileName = "운동 일지";
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8"));
         for (WorkoutEntry entry : entries) {
             writer.write(entry instanceof GoalWorkoutEntry ? ((GoalWorkoutEntry) entry).toCSV() : entry.toCSV());
@@ -232,8 +247,7 @@ public class WorkoutJournalApp {
     }
 
     private static void loadFromFile(Scanner scanner) throws IOException {
-        System.out.print("불러올 파일 이름을 입력하세요: ");
-        String fileName = scanner.next();
+        String fileName = "운동 일지";
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
         entries.clear();
         String line;
@@ -262,16 +276,26 @@ public class WorkoutJournalApp {
     }
 
     private static void recommendUndertrained() {
-        Map<String, Integer> partCount = new HashMap<>();
-        for (WorkoutEntry entry : entries) {
-            String part = entry.getExercise().getClass().getSimpleName();
-            partCount.put(part, partCount.getOrDefault(part, 0) + 1);
+    	int minCount = Integer.MAX_VALUE;
+        for (String target : ALLTARGETS) {
+            int count = targetFrequency.getOrDefault(target, 0);
+            if (count < minCount) {
+                minCount = count;
+            }
         }
-        String leastTrained = partCount.entrySet().stream()
-                .min(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("정보 없음");
 
-        System.out.println("가장 적게 훈련한 부위는: " + leastTrained);
+        // 최소 카운트를 가진 모든 부위를 모은다
+        List<String> leastTrained = new ArrayList<>();
+        for (String target : ALLTARGETS) {
+            if (targetFrequency.getOrDefault(target, 0) == minCount) {
+                leastTrained.add(target);
+            }
+        }
+
+        // 결과 출력
+        System.out.println("가장 적게 훈련한 부위:");
+        for (String part : leastTrained) {
+            System.out.println("- " + part + " (횟수: " + targetFrequency.getOrDefault(part, 0) + ")");
+        }
     }
 }
