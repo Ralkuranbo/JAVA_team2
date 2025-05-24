@@ -4,7 +4,7 @@ class User{
 	private boolean gender;
 	private float height;
 	
-	public User(int age, float weight, boolean gender, float height) {
+	public User(boolean gender, int age, float height, float weight) {
 		this.age=age;
 		this.weight=weight;
 		this.gender=gender;
@@ -28,7 +28,7 @@ class User{
 		return height;
 	}
 	
-	public boolean getGen() {
-		return gender;
+	public String getGen() {
+		return gender?"남자":"여자";
 	}
 }

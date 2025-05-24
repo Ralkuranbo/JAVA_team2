@@ -176,13 +176,15 @@ public class WorkoutJournalApp {
         int reps = scanner.nextInt();
         System.out.print("세트 수: ");
         int sets = scanner.nextInt();
+        /*
         System.out.print("목표 무게: ");
         int goalWeight = scanner.nextInt();
         System.out.print("목표 횟수: ");
         int goalReps = scanner.nextInt();
+        */
         
         date=LocalDate.now();
-        GoalWorkoutEntry entry = new GoalWorkoutEntry(exercise, weight, reps, sets, goalWeight, goalReps, date);
+        WorkoutEntry entry = new WorkoutEntry(exercise, weight, reps, sets, date);
         entries.add(entry);
         
         String[] targets = exercise.target;
@@ -192,7 +194,7 @@ public class WorkoutJournalApp {
             }
         }
 
-        System.out.println("운동이 추가되었습니다. 목표 달성 여부: " + (entry.isGoalAchieved() ? "성공" : "실패"));
+        //System.out.println("운동이 추가되었습니다. 목표 달성 여부: " + (entry.isGoalAchieved() ? "성공" : "실패"));
     }
     
     private static void userInfo(Scanner scanner) {
@@ -232,14 +234,16 @@ public class WorkoutJournalApp {
     		System.out.println("오류 : 잘못된 키입니다.");
     		return;
     	}
-    	user = new User(age, weight, gend, height);
+    	user = new User(gend, age, height, weight);
     }
 
     private static void saveToFile(Scanner scanner) throws IOException {
         String fileName = "운동 일지";
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8"));
+        writer.write(""+ user.getGen() + ","+ user.getAge() + "," + user.getHeight() +","+ user.getWeight());
+        writer.newLine();
         for (WorkoutEntry entry : entries) {
-            writer.write(entry instanceof GoalWorkoutEntry ? ((GoalWorkoutEntry) entry).toCSV() : entry.toCSV());
+            writer.write(entry instanceof WorkoutEntry ? ((WorkoutEntry) entry).toCSV() : entry.toCSV());
             writer.newLine();
         }
         writer.close();
@@ -251,10 +255,18 @@ public class WorkoutJournalApp {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
         entries.clear();
         String line;
+        String data[];
+        line=reader.readLine();
+        data=line.split(",");
+        boolean gend=data[0].equals("남자")?true:false;
+        int age = Integer.parseInt(data[1]);
+        float height = Float.parseFloat(data[2]);
+        float weight = Float.parseFloat(data[3]);
+        user = new User(gend, age, height, weight);
         while ((line = reader.readLine()) != null) {
-            String[] data = line.split(",");
+            data = line.split(",");
             if (data.length > 5) {
-                entries.add(GoalWorkoutEntry.fromCSV(data));
+                entries.add(WorkoutEntry.fromCSV(data));
             } else {
                 entries.add(WorkoutEntry.fromCSV(data));
             }
@@ -271,10 +283,11 @@ public class WorkoutJournalApp {
 
         // 사용자 기본 정보 출력
         System.out.println("\n[사용자 정보]");
-        System.out.println("성별: " + (user.getGen()?"남자":"여자"));
+        System.out.println("성별: " + user.getGen());
         System.out.println("나이: " + user.getAge());
         System.out.println("키: " + user.getHeight() + "cm");
         System.out.println("몸무게: " + user.getWeight() + "kg");
+        System.out.println("BMI: " + user.getBMI());
 
         // 날짜별 운동 기록 정리
         Map<LocalDate, List<WorkoutEntry>> entriesByDate = new TreeMap<>(); // 날짜 순 정렬을 위해 TreeMap 사용
@@ -297,6 +310,7 @@ public class WorkoutJournalApp {
                 );
             }
         }
+        System.out.println("");
     }
 
     private static void recommendUndertrained() {

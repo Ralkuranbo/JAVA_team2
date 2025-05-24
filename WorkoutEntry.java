@@ -39,7 +39,7 @@ class WorkoutEntry {
     }
 
     public String toCSV() {
-        return String.join(",",
+        return this.getDate() + "," + String.join(",",
                 exercise.getClass().getSimpleName(),
                 exercise.getName(),
                 String.valueOf(weight),
